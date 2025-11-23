@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classes - School Notebook</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="icon" href="data:,">
+    <style>
+        .view-grades-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: auto;
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .view-grades-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .view-grades-btn:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
+        .view-grades-btn.active {
+            background: #1d4ed8;
+        }
+
+        .class-select-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .class-select {
+            flex: 1;
+            min-width: 260px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .class-select:hover {
+            background: #ffffff;
+        }
+
+        .class-select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background: #ffffff;
+        }
+
+        .grade-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.35);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 90;
+        }
+
+        .grade-modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .grade-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 100;
+        }
+
+        .grade-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .grade-modal-content {
+            width: min(480px, 100%);
+            max-height: 80vh;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .grade-modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9fafb;
+        }
+
+        .grade-modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: none;
+            padding: 6px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        .grade-modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+        }
+
+        .grade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .grade-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .grade-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .grade-subject {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .grade-value {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            font-weight: 700;
+            color: #ffffff;
+            background: #2563eb;
+        }
+
+        .grade-item-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .grade-item-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .grade-feedback {
+            font-size: 13px;
+            color: #4b5563;
+        }
+
+        .grade-empty-state,
+        .grade-error-state,
+        .grade-loading-state {
+            padding: 24px;
+            text-align: center;
+            color: #4b5563;
+        }
+
+        .grade-loading-state {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grade-loading-spinner {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 3px solid #dbeafe;
+            border-top-color: #2563eb;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .grade-delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #ef4444;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+        }
+
+        .grade-item:hover .grade-delete-btn {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(-2px);
+        }
+
+        .grade-delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .grade-delete-btn:disabled {
+            background: #fca5a5;
+            cursor: not-allowed;
+        }
+
+        .grade-modal-alert-container {
+            margin-bottom: 10px;
+        }
+
+        .grade-modal-alert {
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .grade-modal-alert.error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        .grade-modal-alert.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #047857;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .feedback-toggle-btn {
+            align-self: flex-start;
+            background: transparent;
+            border: none;
+            color: #2563eb;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .feedback-toggle-btn:hover {
+            text-decoration: underline;
+        }
+
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feedback-form textarea {
+            width: 100%;
+            min-height: 90px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            padding: 10px;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .feedback-form textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .feedback-actions .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+        }
+
+        .feedback-actions .btn-primary {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .feedback-actions .btn-primary:hover {
+            background: #1d4ed8;
+        }
+
+        .feedback-actions .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+
+        .feedback-actions .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .grade-delete-form {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#2563eb"/>
+                        <path d="M8 7H14" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#2563eb" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <span class="brand-text">School Notebook</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/teacher/home" class="nav-link">Home</a>
+                <a href="/teacher/students" class="nav-link active">Classes</a>
+                <a href="/teacher/assignments" class="nav-link">Assignments</a>
+                <a href="/teacher/grades" class="nav-link">Grades</a>
+                <a href="/teacher/attendance" class="nav-link">Attendance</a>
+            </div>
+            <div class="nav-user" th:if="${user != null}">
+                <div class="user-avatar">
+                    <span class="avatar-text" th:text="${#strings.substring(user.firstName, 0, 1) + #strings.substring(user.lastName, 0, 1)}">TT</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" th:text="${user.firstName + ' ' + user.lastName}">Teacher</span>
+                    <span class="user-role" th:text="${user.userType.displayType}">Teacher</span>
+                </div>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="btn-logout">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="16,17 21,12 16,7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="home-grid" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));">
+            <div class="home-card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <h2 class="card-title">Select Class</h2>
+                </div>
+                <div class="card-content">
+                    <p style="margin-bottom: 16px;">Choose one of your classes to view the enrolled students.</p>
+                    <div class="form-group class-select-group">
+                        <select class="class-select"
+                                id="courseSelect"
+                                onchange="handleClassChange()">
+                            <option value="">Select a class...</option>
+                            <option th:each="course : ${courses}"
+                                    th:value="${course.id}"
+                                    th:selected="${selectedCourseId != null and selectedCourseId.equals(course.id)}"
+                                    th:text="${course.name}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-card" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <h2 class="card-title">Students</h2>
+                </div>
+                <div class="card-content">
+                    <div th:if="${#lists.isEmpty(students)}" style="color: #6b7280;">
+                        No students found for this class.
+                    </div>
+                    <div th:if="${!#lists.isEmpty(students)}" class="classes-list" id="studentsList">
+                        <div th:each="student : ${students}" class="class-item" style="padding: 16px; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 12px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="display: flex; align-items: center; gap: 16px; width: 100%;">
+                                    <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+                                        <div class="student-avatar" style="width: 48px; height: 48px; border-radius: 50%; background: #e0e7ff; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #312e81;">
+                                            <span th:text="${#strings.substring(student.firstName, 0, 1) + #strings.substring(student.lastName, 0, 1)}">AA</span>
+                                        </div>
+                                        <div>
+                                            <div style="font-weight: 600;" th:text="${student.firstName + ' ' + student.lastName}">Student Name</div>
+                                            <div style="color: #6b7280;" th:text="${student.email}">student@example.com</div>
+                                        </div>
+                                    </div>
+                                    <a class="view-grades-btn"
+                                       th:href="@{/teacher/students(courseId=${selectedCourseId}, studentId=${student.id})}"
+                                       th:classappend="${selectedStudentId != null and selectedStudentId.equals(student.id)} ? ' active'">
+                                        View Grades
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="gradeModalBackdrop" class="grade-modal-backdrop" th:classappend="${showGradesModal} ? ' active'"></div>
+    <div id="gradeModal" class="grade-modal" role="dialog" aria-modal="true" aria-labelledby="gradeModalTitle"
+         th:attr="data-show-modal=${showGradesModal}">
+        <div class="grade-modal-content">
+            <div class="grade-modal-header">
+                <h3 class="grade-modal-title" id="gradeModalTitle">
+                    <span>Grades</span>
+                    <span th:if="${selectedStudent != null}" style="font-size: 14px; font-weight: 500; color: #6b7280; display: block;">
+                        <span th:text="${selectedStudent.firstName + ' ' + selectedStudent.lastName}">Student Name</span>
+                    </span>
+                </h3>
+                <button type="button" class="modal-close-btn" id="closeGradeModal" aria-label="Close grades dialog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="6" y1="6" x2="18" y2="18" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/>
+                        <line x1="18" y1="6" x2="6" y2="18" stroke="#111827" stroke-width="1.8" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="grade-modal-body" id="gradeModalBody">
+                <div class="grade-modal-alert-container">
+                    <div th:if="${successMessage != null}" class="grade-modal-alert success" th:text="${successMessage}"></div>
+                    <div th:if="${errorMessage != null}" class="grade-modal-alert error" th:text="${errorMessage}"></div>
+                </div>
+
+                <div th:if="${selectedStudent == null}" class="grade-empty-state">
+                    <p>Select a student to view grades.</p>
+                </div>
+
+                <div th:if="${selectedStudent != null}">
+                    <div th:if="${#lists.isEmpty(studentGrades)}" class="grade-empty-state">
+                        <p>No grades recorded for this student yet.</p>
+                    </div>
+                    <div th:if="${!#lists.isEmpty(studentGrades)}" class="grade-list">
+                        <div th:each="grade : ${studentGrades}" class="grade-item">
+                            <form th:action="@{/teacher/grades/{gradeId}/delete(gradeId=${grade.gradeId})}"
+                                  method="post"
+                                  class="grade-delete-form">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="studentId" th:value="${selectedStudentId}"/>
+                                <input type="hidden" name="courseId" th:value="${selectedCourseId}"/>
+                                <button type="submit" class="grade-delete-btn">Delete</button>
+                            </form>
+
+                            <div class="grade-item-header">
+                                <div>
+                                    <div class="grade-subject" th:text="${grade.subject}">Subject</div>
+                                    <div style="font-size: 13px; color: #6b7280;" th:text="${grade.gradeType}">Grade Type</div>
+                                </div>
+                                <div class="grade-value" th:text="${grade.gradeValue != null ? grade.gradeValue : '-'}">-</div>
+                            </div>
+
+                            <div class="grade-item-meta">
+                                <span><strong>Date:</strong>
+                                    <span th:text="${grade.gradedOn != null ? #temporals.format(grade.gradedOn, 'dd MMM yyyy') : '—'}">—</span>
+                                </span>
+                                <span><strong>Graded by:</strong>
+                                    <span th:text="${grade.gradedBy != null ? grade.gradedBy : '—'}">—</span>
+                                </span>
+                            </div>
+
+                            <div class="grade-feedback" th:if="${grade.feedback != null}">
+                                <strong>Feedback:</strong>
+                                <span th:text="${grade.feedback}"></span>
+                            </div>
+
+                            <button type="button"
+                                    class="feedback-toggle-btn"
+                                    data-action="edit-feedback"
+                                    th:text="${grade.feedback != null ? 'Edit Feedback' : 'Add Feedback'}">
+                                Edit Feedback
+                            </button>
+
+                            <form th:action="@{/teacher/grades/{gradeId}/feedback(gradeId=${grade.gradeId})}"
+                                  method="post"
+                                  class="feedback-form hidden"
+                                  data-feedback-form>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <input type="hidden" name="studentId" th:value="${selectedStudentId}"/>
+                                <input type="hidden" name="courseId" th:value="${selectedCourseId}"/>
+                                <textarea name="feedback" maxlength="500" th:text="${grade.feedback}"></textarea>
+                                <div class="feedback-actions">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                    <button type="button" class="btn btn-secondary" data-action="cancel-feedback">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function handleClassChange() {
+            const select = document.getElementById('courseSelect');
+            if (!select) {
+                return;
+            }
+            const courseId = select.value;
+            const url = courseId ? `/teacher/students?courseId=${courseId}` : '/teacher/students';
+            window.location.href = url;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('gradeModal');
+            const modalBackdrop = document.getElementById('gradeModalBackdrop');
+            const closeModalBtn = document.getElementById('closeGradeModal');
+
+            if (!modal || !modalBackdrop || !closeModalBtn) {
+                return;
+            }
+
+            const showModalOnLoad = modal.dataset.showModal === 'true';
+
+            function openModal() {
+                modal.classList.add('active');
+                modalBackdrop.classList.add('active');
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                modalBackdrop.classList.remove('active');
+
+                if (window.history && window.history.replaceState) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('studentId');
+                    url.searchParams.delete('successMessage');
+                    url.searchParams.delete('errorMessage');
+                    window.history.replaceState({}, document.title, url.toString());
+                }
+            }
+
+            if (showModalOnLoad) {
+                openModal();
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modalBackdrop.addEventListener('click', closeModal);
+
+            document.querySelectorAll('[data-action="edit-feedback"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const gradeItem = button.closest('.grade-item');
+                    if (!gradeItem) {
+                        return;
+                    }
+                    const form = gradeItem.querySelector('[data-feedback-form]');
+                    if (!form) {
+                        return;
+                    }
+                    form.classList.toggle('hidden');
+                    if (!form.classList.contains('hidden')) {
+                        const textarea = form.querySelector('textarea');
+                        if (textarea) {
+                            textarea.focus();
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-action="cancel-feedback"]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const form = button.closest('[data-feedback-form]');
+                    if (form) {
+                        form.classList.add('hidden');
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-feedback-form]').forEach(form => {
+                form.addEventListener('submit', () => {
+                    const submitBtn = form.querySelector('.btn-primary');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Saving...';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+

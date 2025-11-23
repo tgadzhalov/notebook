@@ -1,0 +1,683 @@
+:root {
+    --bg: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3a3a3a;
+    --text: #f0f0f0;
+    --text-muted: #b8b8b8;
+    --text-light: #8a8a8a;
+    --border: #4a4a4a;
+    --border-light: #3a3a3a;
+    --primary: #7c3aed;
+    --primary-600: #6d28d9;
+    --primary-700: #5b21b6;
+    --primary-50: rgba(124, 58, 237, 0.15);
+    --secondary: #ec4899;
+    --secondary-50: rgba(236, 72, 153, 0.15);
+    --accent: #06b6d4;
+    --accent-50: rgba(6, 182, 212, 0.15);
+    --success: #10b981;
+    --success-50: rgba(16, 185, 129, 0.15);
+    --warning: #f59e0b;
+    --warning-50: rgba(245, 158, 11, 0.15);
+    --error: #ef4444;
+    --error-50: rgba(239, 68, 68, 0.15);
+    --card: rgba(45, 45, 45, 0.85);
+    --card-hover: rgba(45, 45, 45, 0.95);
+    --ring: rgba(124, 58, 237, 0.4);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-lg: rgba(0, 0, 0, 0.5);
+    --nav-height: 70px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1e1e1e 100%);
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Subtle grid pattern */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -40vmax;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    transform: translateZ(0);
+    pointer-events: none;
+}
+
+/* Floating accent blobs */
+body::after {
+    content: "";
+    position: fixed;
+    width: 80vmax;
+    height: 80vmax;
+    top: -30vmax;
+    right: -20vmax;
+    background: radial-gradient(closest-side, rgba(124, 58, 237, 0.2), transparent 60%),
+                radial-gradient(closest-side, rgba(236, 72, 153, 0.15), transparent 60%);
+    filter: blur(40px);
+    animation: floatBlob 20s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes floatBlob {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(-8vmax, 4vmax, 0) rotate(12deg); }
+    100% { transform: translate3d(-15vmax, -5vmax, 0) rotate(-8deg); }
+}
+
+/* Navigation Bar */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--nav-height);
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(140%) blur(10px);
+    z-index: 1000;
+    box-shadow: 0 4px 20px var(--shadow);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-logo {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+}
+
+.nav-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link {
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--text);
+    background: var(--primary-50);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    background: var(--primary-50);
+}
+
+.nav-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    display: grid;
+    place-items: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: white;
+}
+
+.user-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+}
+
+.user-role {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+
+.logout-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    color: var(--error);
+    background: var(--error-50);
+}
+
+/* Main Content */
+.main-content {
+    margin-top: var(--nav-height);
+    min-height: calc(100vh - var(--nav-height));
+    padding: 32px 24px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 8px 32px var(--shadow);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.01em;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.student-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 20px;
+    color: white;
+    box-shadow: 0 8px 24px var(--shadow);
+}
+
+.student-details h2 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.student-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.student-meta span {
+    padding: 3px 10px;
+    background: var(--primary-50);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.grade-summary {
+    display: flex;
+    gap: 16px;
+}
+
+.summary-card {
+    text-align: center;
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    min-width: 100px;
+}
+
+.summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
+
+.summary-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Grades Grid */
+.grades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+/* Subject Cards */
+.subject-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px var(--shadow);
+    transition: all 0.2s ease;
+}
+
+.subject-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--shadow-lg);
+    border-color: var(--primary);
+}
+
+.subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.subject-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.subject-average {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.average-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.average-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Grades Container */
+.grades-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Grade Items */
+.grade-item {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.grade-item:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 8px 24px var(--shadow-lg);
+}
+
+.grade-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Grade Colors */
+.grade-6 {
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.grade-6:hover {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+}
+
+.grade-5 {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+.grade-5:hover {
+    box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+}
+
+.grade-4 {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.grade-4:hover {
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+}
+
+.grade-3 {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+}
+
+.grade-3:hover {
+    box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4);
+}
+
+.grade-2 {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.grade-2:hover {
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
+}
+
+.grade-na {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    box-shadow: 0 4px 12px rgba(55, 65, 81, 0.3);
+}
+
+.grade-na:hover {
+    box-shadow: 0 8px 24px rgba(55, 65, 81, 0.4);
+}
+
+/* Tooltip */
+.grade-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.grade-item:hover .grade-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.tooltip-content {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 8px 24px var(--shadow-lg);
+    backdrop-filter: saturate(140%) blur(10px);
+    min-width: 200px;
+    position: relative;
+}
+
+.tooltip-content::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--border);
+}
+
+.tooltip-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.tooltip-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tooltip-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.tooltip-value {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.subject-empty {
+    padding: 16px;
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.empty-state {
+    margin-top: 40px;
+    text-align: center;
+    padding: 40px;
+    border: 1px dashed var(--border);
+    border-radius: 16px;
+    background: var(--card);
+}
+
+.empty-state h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: var(--text);
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .grades-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 16px;
+    }
+    
+    .nav-menu {
+        display: none;
+    }
+    
+    .main-content {
+        padding: 24px 16px;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    
+    .student-meta {
+        justify-content: center;
+    }
+    
+    .grade-summary {
+        justify-content: center;
+    }
+    
+    .grades-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .subject-header {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .subject-average {
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0 12px;
+    }
+    
+    .main-content {
+        padding: 20px 12px;
+    }
+    
+    .page-header {
+        padding: 20px;
+    }
+    
+    .student-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 18px;
+    }
+    
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .student-details h2 {
+        font-size: 18px;
+    }
+    
+    .student-meta {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .grade-summary {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .summary-card {
+        min-width: auto;
+    }
+    
+    .grades-container {
+        justify-content: center;
+    }
+    
+    .grade-item {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .grade-value {
+        font-size: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}

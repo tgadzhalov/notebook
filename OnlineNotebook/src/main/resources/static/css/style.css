@@ -1,0 +1,280 @@
+:root {
+    --bg: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text: #f0f0f0;
+    --text-muted: #b8b8b8;
+    --text-light: #8a8a8a;
+    --border: #4a4a4a;
+    --border-light: #3a3a3a;
+    --primary: #7c3aed;
+    --primary-600: #6d28d9;
+    --primary-700: #5b21b6;
+    --primary-50: rgba(124, 58, 237, 0.15);
+    --secondary: #ec4899;
+    --secondary-50: rgba(236, 72, 153, 0.15);
+    --accent: #06b6d4;
+    --accent-50: rgba(6, 182, 212, 0.15);
+    --success: #10b981;
+    --success-50: rgba(16, 185, 129, 0.15);
+    --warning: #f59e0b;
+    --warning-50: rgba(245, 158, 11, 0.15);
+    --card: rgba(45, 45, 45, 0.85);
+    --card-hover: rgba(45, 45, 45, 0.95);
+    --ring: rgba(124, 58, 237, 0.4);
+    --shadow: rgba(0, 0, 0, 0.4);
+    --shadow-lg: rgba(0, 0, 0, 0.5);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body { 
+    height: 100%; 
+    margin: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1e1e1e 100%);
+    position: relative;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Subtle grid pattern */
+body::before {
+    content: "";
+    position: fixed;
+    inset: -40vmax;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    transform: translateZ(0);
+    pointer-events: none;
+}
+
+/* Floating accent blobs */
+body::after {
+    content: "";
+    position: fixed;
+    width: 80vmax;
+    height: 80vmax;
+    top: -30vmax;
+    right: -20vmax;
+    background: radial-gradient(closest-side, rgba(124, 58, 237, 0.2), transparent 60%),
+                radial-gradient(closest-side, rgba(236, 72, 153, 0.15), transparent 60%);
+    filter: blur(40px);
+    animation: floatBlob 20s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes floatBlob {
+    0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+    50%  { transform: translate3d(-8vmax, 4vmax, 0) rotate(12deg); }
+    100% { transform: translate3d(-15vmax, -5vmax, 0) rotate(-8deg); }
+}
+
+/* Main container */
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* Hero section */
+.hero {
+    text-align: center;
+    max-width: 600px;
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 60px 40px;
+    box-shadow: 0 20px 60px var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,0.35);
+    backdrop-filter: saturate(140%) blur(10px);
+}
+
+.logo {
+    display: inline-grid;
+    place-items: center;
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary-50) 100%);
+    border: 2px solid var(--border);
+    box-shadow: 0 20px 40px var(--shadow-lg), 0 0 0 8px rgba(59, 130, 246, 0.1);
+    margin: 0 auto 32px;
+    position: relative;
+}
+
+.logo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 100% at 0% 0%, rgba(6, 182, 212, 0.2), transparent 50%),
+                radial-gradient(120% 100% at 100% 0%, rgba(139, 92, 246, 0.2), transparent 50%);
+    pointer-events: none;
+}
+
+.title {
+    margin: 0 0 16px;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--text) 0%, var(--primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    margin: 0 0 40px;
+    color: var(--text-muted);
+    font-size: 20px;
+    line-height: 1.6;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    appearance: none;
+    border: 2px solid transparent;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.3s ease;
+    will-change: transform;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
+}
+
+.btn::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.3), rgba(255,255,255,0));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px var(--shadow-lg);
+}
+
+.btn:hover::after { 
+    opacity: 1; 
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-600) 100%);
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 16px 32px rgba(59, 130, 246, 0.4);
+}
+
+.btn-secondary {
+    background: var(--card);
+    color: var(--text);
+    border-color: var(--border);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+.btn-secondary:hover {
+    background: var(--card-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .hero {
+        padding: 40px 24px;
+    }
+    
+    .title {
+        font-size: 36px;
+    }
+    
+    .subtitle {
+        font-size: 18px;
+    }
+    
+    .actions {
+        gap: 12px;
+    }
+    
+    .btn {
+        padding: 14px 24px;
+        font-size: 15px;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 32px 20px;
+    }
+    
+    .title {
+        font-size: 28px;
+    }
+    
+    .subtitle {
+        font-size: 16px;
+    }
+    
+    .logo {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * { 
+        animation: none !important; 
+        transition: none !important; 
+    }
+}

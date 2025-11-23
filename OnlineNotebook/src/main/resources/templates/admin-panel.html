@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Panel - User Management</title>
+    <link rel="stylesheet" href="/css/admin-panel.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main class="container">
+        <section class="admin-card">
+            <div class="admin-header">
+                <div class="logo" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="18" height="18" rx="3" fill="#ffffff" stroke="#6366f1"/>
+                        <path d="M8 8H16" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 12H16" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 16H13" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="17" cy="7" r="2" fill="#6366f1"/>
+                    </svg>
+                </div>
+                <h1 class="title">Admin Panel</h1>
+                <p class="subtitle">Manage users - Create teachers and students</p>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="tab-container">
+                <button class="tab-btn active" data-tab="single">Single User</button>
+                <button class="tab-btn" data-tab="bulk">Bulk Import (JSON)</button>
+                <button class="tab-btn" data-tab="imported">Imported Users</button>
+                <button class="tab-btn" data-tab="course">Course Management</button>
+            </div>
+
+            <!-- Success/Error Messages -->
+            <div id="messageContainer" class="message-container" style="display: none;">
+                <div id="message" class="message"></div>
+            </div>
+
+            <!-- Single User Form -->
+            <div id="singleTab" class="tab-content active">
+                <form th:action="@{/user}" method="post" th:object="${registerDto}" id="singleUserForm" class="admin-form" novalidate>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input
+                                type="text" 
+                                id="firstName" 
+                                name="firstName"
+                                class="form-input" 
+                                placeholder="Enter first name"
+                                required
+                                minlength="2"
+                                maxlength="25"
+                                th:field="*{firstName}"
+
+                            >
+                            <div class="requirement-text">2-25 chars</div>
+                            <div class="error-message" id="firstNameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input 
+                                type="text" 
+                                id="lastName" 
+                                name="lastName"
+                                class="form-input" 
+                                placeholder="Enter last name"
+                                required
+                                minlength="2"
+                                maxlength="25"
+                                th:field="*{lastName}"
+
+                            >
+                            <div class="requirement-text">2-25 chars</div>
+                            <div class="error-message" id="lastNameError"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email"
+                            class="form-input" 
+                            placeholder="Enter email address"
+                            required
+                            autocomplete="email"
+                            th:field="*{email}"
+
+                        >
+                        <div class="error-message" id="emailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password"
+                                class="form-input" 
+                                placeholder="Create a password"
+                                required
+                                minlength="8"
+                                maxlength="50"
+                                autocomplete="new-password"
+                                th:field="*{password}"
+
+                            >
+                            <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="requirement-text">8-50 chars</div>
+                        <div class="error-message" id="passwordError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">User Type</label>
+                        <div class="role-selection">
+                            <div class="role-option" data-role="STUDENT">
+                                <div class="role-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/>
+                                        <path d="M12 3L1 9L12 15L21 10.09V17H23V9L12 3Z" fill="currentColor"/>
+                                        <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                                        <path d="M12 10C9.79 10 8 11.79 8 14V16H16V14C16 11.79 14.21 10 12 10Z" fill="currentColor"/>
+                                    </svg>
+                                </div>
+                                <div class="role-content">
+                                    <h3 class="role-title">Student</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="role-option" data-role="TEACHER">
+                                <div class="role-icon">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="7" r="3" fill="currentColor"/>
+                                        <path d="M12 11C8.13 11 5 14.13 5 18V20H19V18C19 14.13 15.87 11 12 11Z" fill="currentColor"/>
+                                        <rect x="2" y="4" width="4" height="3" rx="0.5" fill="currentColor"/>
+                                        <rect x="18" y="4" width="4" height="3" rx="0.5" fill="currentColor"/>
+                                        <rect x="6" y="2" width="12" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                        <line x1="8" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="1"/>
+                                        <line x1="8" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1"/>
+                                    </svg>
+                                </div>
+                                <div class="role-content">
+                                    <h3 class="role-title">Teacher</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <input
+                                th:field="*{userType}" type="hidden" id="userType" name="userType" required>
+                        <div class="error-message" id="userTypeError"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="createUserBtn">
+                        <span class="btn-text">Create User</span>
+                        <div class="btn-spinner" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Bulk Import Tab -->
+            <div id="bulkTab" class="tab-content">
+                <div class="bulk-import-section">
+                    <div class="info-box">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="8" r="1" fill="currentColor"/>
+                        </svg>
+                        <div>
+                            <strong>JSON Format:</strong>
+                            <pre class="json-example">[
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "password123",
+    "userType": "STUDENT",
+    "studentClass": "11B"
+  },
+  {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "email": "jane.smith@example.com",
+    "password": "password123",
+    "userType": "TEACHER"
+  }
+]</pre>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="jsonInput" class="form-label">JSON Data</label>
+                        <textarea 
+                            id="jsonInput" 
+                            class="form-textarea" 
+                            placeholder="Paste JSON array of users here..."
+                            rows="12"
+                        ></textarea>
+                        <div class="error-message" id="jsonError"></div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-full" id="bulkImportBtn">
+                        <span class="btn-text">Import Users</span>
+                        <div class="btn-spinner" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Imported Users Tab -->
+            <div id="importedTab" class="tab-content">
+                <div class="imported-users-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recently Imported Users</h2>
+                        <button type="button" class="btn btn-secondary" id="refreshUsersBtn">
+                            <span class="btn-text">Refresh</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px;">
+                                <path d="M3 12C3 7.03 7.03 3 12 3C16.97 3 21 7.03 21 12C21 16.97 16.97 21 12 21C7.03 21 3 16.97 3 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 3V9M12 21V15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M21 12H15M9 12H3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div id="usersLoading" class="loading-state" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Loading users...</p>
+                    </div>
+                    
+                    <div id="usersContainer" class="users-container">
+                        <!-- Users will be loaded here -->
+                    </div>
+                    
+                    <div id="emptyState" class="empty-state" style="display: none;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+                            <path d="M6 21C6 17.13 9.13 14 13 14C16.87 14 20 17.13 20 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <p>No users found</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Management Tab -->
+            <div id="courseTab" class="tab-content">
+                <form th:object="${courseDto}" id="courseForm" class="admin-form" novalidate>
+                    <div class="form-group">
+                        <label for="courseName" class="form-label">Course Name</label>
+                        <input
+                            type="text" 
+                            id="courseName" 
+                            name="name"
+                            class="form-input" 
+                            placeholder="Enter course name"
+                            required
+                            minlength="2"
+                            maxlength="100"
+                            th:field="*{name}"
+                        >
+                        <div class="requirement-text">2-100 chars</div>
+                        <div class="error-message" id="courseNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseDescription" class="form-label">Description (Optional)</label>
+                        <textarea
+                            id="courseDescription" 
+                            name="description"
+                            class="form-textarea" 
+                            placeholder="Enter course description"
+                            maxlength="255"
+                            rows="4"
+                            th:field="*{description}"
+                        ></textarea>
+                        <div class="requirement-text">Max 255 chars</div>
+                        <div class="error-message" id="courseDescriptionError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseSubjects" class="form-label">Subjects</label>
+                        <div class="subjects-selection">
+                            <label class="subject-checkbox">
+                                <input type="checkbox" name="subjects" value="MATH">
+                                <span>Mathematics</span>
+                            </label>
+                            <label class="subject-checkbox">
+                                <input type="checkbox" name="subjects" value="ENGLISH">
+                                <span>English</span>
+                            </label>
+                            <label class="subject-checkbox">
+                                <input type="checkbox" name="subjects" value="BULGARIAN">
+                                <span>Bulgarian</span>
+                            </label>
+                            <label class="subject-checkbox">
+                                <input type="checkbox" name="subjects" value="SPORT">
+                                <span>Sport</span>
+                            </label>
+                            <label class="subject-checkbox">
+                                <input type="checkbox" name="subjects" value="SCIENCE">
+                                <span>Science</span>
+                            </label>
+                        </div>
+                        <div class="error-message" id="courseSubjectsError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseSchoolYear" class="form-label">School Year</label>
+                        <input
+                            type="text" 
+                            id="courseSchoolYear" 
+                            name="schoolYear"
+                            class="form-input" 
+                            placeholder="e.g., 2024-2025"
+                            required
+                            maxlength="20"
+                            th:field="*{schoolYear}"
+                        >
+                        <div class="requirement-text">Max 20 chars</div>
+                        <div class="error-message" id="courseSchoolYearError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseTeacher" class="form-label">Assign Teacher</label>
+                        <select
+                            id="courseTeacher" 
+                            name="teacherId"
+                            class="form-input" 
+                            required
+                            th:field="*{teacherId}"
+                        >
+                            <option value="">Select a teacher...</option>
+                            <!-- Teachers will be loaded dynamically -->
+                        </select>
+                        <div class="error-message" id="courseTeacherError"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full" id="createCourseBtn">
+                        <span class="btn-text">Create Course</span>
+                        <div class="btn-spinner" style="display: none;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                    <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                    <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                </circle>
+                            </svg>
+                        </div>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(targetTab + 'Tab').classList.add('active');
+                    
+                    if (targetTab === 'imported') {
+                        loadRecentUsers();
+                    }
+                    
+                    if (targetTab === 'course') {
+                        loadTeachers();
+                    }
+                    
+                    hideMessage();
+                });
+            });
+
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                });
+            }
+
+            const roleOptions = document.querySelectorAll('#singleTab .role-option');
+            const roleInput = document.getElementById('userType');
+            const roleError = document.getElementById('userTypeError');
+
+            roleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    roleOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    roleInput.value = this.dataset.role;
+                    roleError.textContent = '';
+                });
+            });
+
+            const singleUserForm = document.getElementById('singleUserForm');
+            singleUserForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                clearErrors();
+                
+                if (!validateSingleForm()) {
+                    return;
+                }
+
+                const formData = {
+                    firstName: document.getElementById('firstName').value.trim(),
+                    lastName: document.getElementById('lastName').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value,
+                    userType: roleInput.value
+                };
+
+                const submitBtn = document.getElementById('createUserBtn');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const btnSpinner = submitBtn.querySelector('.btn-spinner');
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'block';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/v1/admin/users', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        singleUserForm.reset();
+                        roleOptions.forEach(opt => opt.classList.remove('selected'));
+                        roleInput.value = '';
+                        if (document.getElementById('importedTab').classList.contains('active')) {
+                            loadRecentUsers();
+                        }
+                    } else {
+                        showMessage(result.message || 'Error creating user', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Network error: ' + error.message, 'error');
+                } finally {
+                    btnText.style.display = 'block';
+                    btnSpinner.style.display = 'none';
+                    submitBtn.disabled = false;
+                }
+            });
+
+            const bulkImportBtn = document.getElementById('bulkImportBtn');
+            bulkImportBtn.addEventListener('click', async function() {
+                const jsonInput = document.getElementById('jsonInput');
+                const jsonError = document.getElementById('jsonError');
+                jsonError.textContent = '';
+
+                const jsonText = jsonInput.value.trim();
+                
+                if (!jsonText) {
+                    jsonError.textContent = 'Please enter JSON data';
+                    return;
+                }
+
+                let users;
+                try {
+                    users = JSON.parse(jsonText);
+                } catch (e) {
+                    jsonError.textContent = 'Invalid JSON format: ' + e.message;
+                    return;
+                }
+
+                if (!Array.isArray(users)) {
+                    jsonError.textContent = 'JSON must be an array of users';
+                    return;
+                }
+
+                if (users.length === 0) {
+                    jsonError.textContent = 'Array cannot be empty';
+                    return;
+                }
+
+                for (let i = 0; i < users.length; i++) {
+                    const user = users[i];
+                    if (!user.firstName || !user.lastName || !user.email || !user.password || !user.userType) {
+                        jsonError.textContent = `User ${i + 1} is missing required fields (firstName, lastName, email, password, userType)`;
+                        return;
+                    }
+                    if (!['STUDENT', 'TEACHER'].includes(user.userType)) {
+                        jsonError.textContent = `User ${i + 1}: userType must be STUDENT or TEACHER`;
+                        return;
+                    }
+                }
+
+                const btnText = bulkImportBtn.querySelector('.btn-text');
+                const btnSpinner = bulkImportBtn.querySelector('.btn-spinner');
+                btnText.style.display = 'none';
+                btnSpinner.style.display = 'block';
+                bulkImportBtn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/v1/admin/users/import', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(users)
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showMessage(result.message, 'success');
+                        jsonInput.value = '';
+                        if (document.getElementById('importedTab').classList.contains('active')) {
+                            loadRecentUsers();
+                        }
+                    } else {
+                        showMessage(result.message || 'Error importing users', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Network error: ' + error.message, 'error');
+                } finally {
+                    btnText.style.display = 'block';
+                    btnSpinner.style.display = 'none';
+                    bulkImportBtn.disabled = false;
+                }
+            });
+
+            function validateSingleForm() {
+                let isValid = true;
+                const firstName = document.getElementById('firstName');
+                const lastName = document.getElementById('lastName');
+                const email = document.getElementById('email');
+                const password = document.getElementById('password');
+
+                if (firstName.value.trim().length < 2 || firstName.value.trim().length > 25) {
+                    document.getElementById('firstNameError').textContent = 'First name must be 2-25 characters';
+                    isValid = false;
+                }
+
+                if (lastName.value.trim().length < 2 || lastName.value.trim().length > 25) {
+                    document.getElementById('lastNameError').textContent = 'Last name must be 2-25 characters';
+                    isValid = false;
+                }
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.value.trim())) {
+                    document.getElementById('emailError').textContent = 'Invalid email format';
+                    isValid = false;
+                }
+
+                if (password.value.length < 8 || password.value.length > 50) {
+                    document.getElementById('passwordError').textContent = 'Password must be 8-50 characters';
+                    isValid = false;
+                }
+
+                if (!roleInput.value) {
+                    roleError.textContent = 'Please select a user type';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            }
+
+            function showMessage(message, type) {
+                const container = document.getElementById('messageContainer');
+                const messageEl = document.getElementById('message');
+                
+                messageEl.textContent = message;
+                messageEl.className = 'message ' + type;
+                container.style.display = 'block';
+                
+                setTimeout(hideMessage, 5000);
+                
+                container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            function hideMessage() {
+                document.getElementById('messageContainer').style.display = 'none';
+            }
+
+            async function loadRecentUsers() {
+                const container = document.getElementById('usersContainer');
+                const loading = document.getElementById('usersLoading');
+                const emptyState = document.getElementById('emptyState');
+                
+                loading.style.display = 'flex';
+                container.innerHTML = '';
+                emptyState.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/v1/admin/users?limit=50');
+                    const users = await response.json();
+                    
+                    loading.style.display = 'none';
+                    
+                    if (users.length === 0) {
+                        emptyState.style.display = 'block';
+                        return;
+                    }
+
+                    container.innerHTML = users.map(user => `
+                        <div class="user-card">
+                            <div class="user-avatar ${user.userType.toLowerCase()}">
+                                ${user.firstName.charAt(0)}${user.lastName.charAt(0)}
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name">${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</div>
+                                <div class="user-email">${escapeHtml(user.email)}</div>
+                                <div class="user-meta">
+                                    <span class="user-type-badge ${user.userType.toLowerCase()}">${user.userType}</span>
+                                    <span class="user-date">Created: ${escapeHtml(user.createdAt)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    loading.style.display = 'none';
+                    container.innerHTML = `<div class="error-message">Error loading users: ${error.message}</div>`;
+                }
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            const refreshBtn = document.getElementById('refreshUsersBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadRecentUsers);
+            }
+
+            if (document.getElementById('importedTab').classList.contains('active')) {
+                loadRecentUsers();
+            }
+
+            const courseForm = document.getElementById('courseForm');
+            if (courseForm) {
+                courseForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    clearCourseErrors();
+                    
+                    if (!validateCourseForm()) {
+                        return;
+                    }
+
+                    const checkedSubjects = Array.from(document.querySelectorAll('#courseTab input[name="subjects"]:checked'))
+                        .map(cb => cb.value);
+                    
+                    if (checkedSubjects.length === 0) {
+                        document.getElementById('courseSubjectsError').textContent = 'Please select at least one subject';
+                        return;
+                    }
+
+                    const formData = {
+                        name: document.getElementById('courseName').value.trim(),
+                        description: document.getElementById('courseDescription').value.trim(),
+                        subjects: checkedSubjects,
+                        schoolYear: document.getElementById('courseSchoolYear').value.trim(),
+                        teacherId: document.getElementById('courseTeacher').value
+                    };
+
+                    const submitBtn = document.getElementById('createCourseBtn');
+                    const btnText = submitBtn.querySelector('.btn-text');
+                    const btnSpinner = submitBtn.querySelector('.btn-spinner');
+                    btnText.style.display = 'none';
+                    btnSpinner.style.display = 'block';
+                    submitBtn.disabled = true;
+
+                    try {
+                    const response = await fetch('/api/v1/admin/courses', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(formData)
+                        });
+
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            showMessage(result.message, 'success');
+                            courseForm.reset();
+                            document.getElementById('courseTeacher').innerHTML = '<option value="">Select a teacher...</option>';
+                            document.querySelectorAll('#courseTab input[name="subjects"]').forEach(cb => cb.checked = false);
+                            loadTeachers();
+                        } else {
+                            showMessage(result.message || 'Error creating course', 'error');
+                        }
+                    } catch (error) {
+                        showMessage('Network error: ' + error.message, 'error');
+                    } finally {
+                        btnText.style.display = 'block';
+                        btnSpinner.style.display = 'none';
+                        submitBtn.disabled = false;
+                    }
+                });
+            }
+
+            async function loadTeachers() {
+                const teacherSelect = document.getElementById('courseTeacher');
+                if (!teacherSelect) return;
+
+                try {
+                    const response = await fetch('/api/v1/admin/teachers');
+                    const teachers = await response.json();
+                    
+                    teacherSelect.innerHTML = '<option value="">Select a teacher...</option>';
+                    teachers.forEach(teacher => {
+                        const option = document.createElement('option');
+                        option.value = teacher.id;
+                        option.textContent = `${teacher.firstName} ${teacher.lastName} (${teacher.email})`;
+                        teacherSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading teachers:', error);
+                }
+            }
+
+            function validateCourseForm() {
+                let isValid = true;
+                const courseName = document.getElementById('courseName');
+                const courseSchoolYear = document.getElementById('courseSchoolYear');
+                const courseTeacher = document.getElementById('courseTeacher');
+
+                if (courseName.value.trim().length < 2 || courseName.value.trim().length > 100) {
+                    document.getElementById('courseNameError').textContent = 'Course name must be 2-100 characters';
+                    isValid = false;
+                }
+
+                if (!courseSchoolYear.value.trim()) {
+                    document.getElementById('courseSchoolYearError').textContent = 'School year is required';
+                    isValid = false;
+                } else if (courseSchoolYear.value.trim().length > 20) {
+                    document.getElementById('courseSchoolYearError').textContent = 'School year must be max 20 characters';
+                    isValid = false;
+                }
+
+                if (!courseTeacher.value) {
+                    document.getElementById('courseTeacherError').textContent = 'Please select a teacher';
+                    isValid = false;
+                }
+
+                const checkedSubjects = document.querySelectorAll('#courseTab input[name="subjects"]:checked');
+                if (checkedSubjects.length === 0) {
+                    document.getElementById('courseSubjectsError').textContent = 'Please select at least one subject';
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            function clearCourseErrors() {
+                document.getElementById('courseNameError').textContent = '';
+                document.getElementById('courseDescriptionError').textContent = '';
+                document.getElementById('courseSubjectsError').textContent = '';
+                document.getElementById('courseSchoolYearError').textContent = '';
+                document.getElementById('courseTeacherError').textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
+

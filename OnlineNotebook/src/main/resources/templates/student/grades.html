@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grades - School Notebook</title>
+    <link rel="stylesheet" href="/css/grades.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#7c3aed"/>
+                        <path d="M8 7H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#7c3aed" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <span class="nav-title">School Notebook</span>
+            </div>
+
+            <div class="nav-menu">
+                <a href="/student/home" class="nav-link" data-section="home">Home</a>
+                <a href="/student/grades" class="nav-link active" data-section="grades">Grades</a>
+            </div>
+
+            <div class="nav-user" th:if="${gradesView != null}">
+                <div class="user-avatar"
+                     th:data-user-id="${gradesView.profile.id}"
+                     th:data-user-avatar="${gradesView.profile.initials}"
+                     th:style="${gradesView.profile.profilePictureUrl != null and gradesView.profile.profilePictureUrl != ''} ? |background-image: url(${gradesView.profile.profilePictureUrl}); background-size: cover; background-position: center;| : ''">
+                    <span class="avatar-text"
+                          th:style="${gradesView.profile.profilePictureUrl != null and gradesView.profile.profilePictureUrl != ''} ? 'display:none;' : ''"
+                          th:text="${gradesView.profile.initials}">JD</span>
+                </div>
+                <div class="user-menu">
+                    <span class="user-name" th:text="${gradesView.profile.firstName + ' ' + gradesView.profile.lastName}">John Doe</span>
+                    <span class="user-role">Student</span>
+                </div>
+                <form action="/logout" method="post" style="display: inline;" id="logoutForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="logout-btn" data-action="logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="16,17 21,12 16,7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content" th:if="${gradesView != null}">
+        <section class="page-header">
+            <div class="header-content">
+                <h1 class="page-title">My Grades</h1>
+                <div class="student-info">
+                    <div class="student-avatar"
+                         th:data-student-id="${gradesView.profile.id}"
+                         th:style="${gradesView.profile.profilePictureUrl != null and gradesView.profile.profilePictureUrl != ''} ? |background-image: url(${gradesView.profile.profilePictureUrl}); background-size: cover; background-position: center;| : ''">
+                        <span class="avatar-text-large"
+                              th:style="${gradesView.profile.profilePictureUrl != null and gradesView.profile.profilePictureUrl != ''} ? 'display:none;' : ''"
+                              th:text="${gradesView.profile.initials}">JD</span>
+                    </div>
+                    <div class="student-details">
+                        <h2 class="student-name" th:text="${gradesView.profile.firstName + ' ' + gradesView.profile.lastName}">John Doe</h2>
+                        <div class="student-meta">
+                            <span class="student-class"></span>
+                            <span class="student-id" th:text="${gradesView.profile.displayId}">ID: STU-2024-001</span>
+                            <span class="student-id"
+                                  th:text="${gradesView.profile.courseName != null ? gradesView.profile.courseName : 'Course not assigned'}">Course</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grade-summary">
+                <div class="summary-card">
+                    <div class="summary-value" th:text="${gradesView.summary.overallAverageDisplay}">--</div>
+                    <div class="summary-label">Overall Grade</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" th:text="${gradesView.summary.totalGrades}">0</div>
+                    <div class="summary-label">Grades Posted</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" th:text="${gradesView.summary.subjectsCount}">0</div>
+                    <div class="summary-label">Subjects</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="grades-grid" th:if="${!#lists.isEmpty(gradesView.subjects)}">
+            <div class="subject-card" th:each="subject : ${gradesView.subjects}" th:data-subject="${subject.subjectCode}">
+                <div class="subject-header">
+                    <h3 class="subject-title" th:text="${subject.subjectName}">Subject</h3>
+                    <div class="subject-average">
+                        <span class="average-label">Average:</span>
+                        <span class="average-value" th:text="${subject.averageDisplay}">--</span>
+                    </div>
+                </div>
+                <div class="grades-container" th:if="${!#lists.isEmpty(subject.grades)}">
+                    <div class="grade-item"
+                         th:each="grade : ${subject.grades}"
+                         th:class="${grade.gradeValue == 6} ? 'grade-item grade-6' : (${grade.gradeValue == 5} ? 'grade-item grade-5' : (${grade.gradeValue == 4} ? 'grade-item grade-4' : (${grade.gradeValue == 3} ? 'grade-item grade-3' : (${grade.gradeValue == 2} ? 'grade-item grade-2' : 'grade-item grade-na'))))"
+                         th:data-grade="${grade.gradeValue}">
+                        <span class="grade-value" th:text="${grade.gradeValue != null ? grade.gradeValue : '--'}">6</span>
+                        <div class="grade-tooltip">
+                            <div class="tooltip-content">
+                                <div class="tooltip-header" th:text="${grade.assignment}">Assessment</div>
+                                <div class="tooltip-details">
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">Grade:</span>
+                                        <span class="tooltip-value" th:text="${grade.gradeDisplay}">Excellent</span>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">Teacher:</span>
+                                        <span class="tooltip-value" th:text="${grade.teacherName}">Ms. Teacher</span>
+                                    </div>
+                                    <div class="tooltip-row">
+                                        <span class="tooltip-label">Date:</span>
+                                        <span class="tooltip-value" th:text="${grade.gradedOn}">Oct 2, 2024</span>
+                                    </div>
+                                    <div class="tooltip-row" th:if="${grade.feedback != null}">
+                                        <span class="tooltip-label">Feedback:</span>
+                                        <span class="tooltip-value" th:text="${grade.feedback}">Great job!</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="subject-empty" th:if="${#lists.isEmpty(subject.grades)}">
+                    No grades recorded for this subject yet.
+                </div>
+            </div>
+        </section>
+
+        <div class="empty-state" th:if="${#lists.isEmpty(gradesView.subjects)}">
+            <h3>No grades yet</h3>
+            <p>Your teachers haven’t posted any grades. Check back later.</p>
+        </div>
+    </main>
+</body>
+</html>
+

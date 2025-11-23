@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schedule - School Notebook</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#7c3aed"/>
+                        <path d="M8 7H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#7c3aed" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <span class="nav-title">School Notebook</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="/student/home" class="nav-link" data-section="home">Home</a>
+                <a href="/student/grades" class="nav-link" data-section="grades">Grades</a>
+                <a href="/student/schedule" class="nav-link active" data-section="schedule">Schedule</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="user-avatar" data-user-id="user123">
+                    <span class="avatar-text">JD</span>
+                </div>
+                <div class="user-menu">
+                    <span class="user-name" data-user-name="John Doe">John Doe</span>
+                    <span class="user-role" data-user-role="student">Student</span>
+                </div>
+                <form action="/logout" method="post" style="display: inline;" id="logoutForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="logout-btn" data-action="logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="16,17 21,12 16,7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <section class="student-header">
+            <div class="student-info">
+                <div class="avatar-container">
+                    <div class="student-avatar" data-student-id="student123">
+                        <span class="avatar-text-large">JD</span>
+                    </div>
+                </div>
+                <div class="student-details">
+                    <h1 class="student-name" data-student-name="John Doe">My Schedule</h1>
+                    <div class="student-meta">
+                        <span class="student-class" data-class="Grade 10A">Grade 10A</span>
+                        <span class="student-id" data-student-id="STU-2024-001">ID: STU-2024-001</span>
+                        <span class="academic-year" data-year="2024-2025">Academic Year: 2024-2025</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Content -->
+        <section class="home-grid">
+            <!-- Weekly Schedule -->
+            <div class="home-card schedule-card" data-card="weekly-schedule" style="grid-column: 1 / -1;">
+                <div class="card-header">
+                    <h2 class="card-title">Weekly Schedule</h2>
+                </div>
+                <div class="card-content">
+                    <div class="schedule-list" data-schedule="weekly">
+                        <!-- Monday -->
+                        <div class="schedule-day">
+                            <h3 class="day-title">Monday</h3>
+                            <div class="schedule-items">
+                                <div class="schedule-item" data-time="09:00" data-subject="Mathematics">
+                                    <div class="time-slot">09:00 - 10:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">Mathematics</span>
+                                        <span class="teacher">Mr. Johnson</span>
+                                        <span class="room">Room 201</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="10:15" data-subject="English">
+                                    <div class="time-slot">10:15 - 11:15</div>
+                                    <div class="class-info">
+                                        <span class="subject">English</span>
+                                        <span class="teacher">Ms. Williams</span>
+                                        <span class="room">Room 105</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="11:30" data-subject="Science">
+                                    <div class="time-slot">11:30 - 12:30</div>
+                                    <div class="class-info">
+                                        <span class="subject">Science</span>
+                                        <span class="teacher">Dr. Smith</span>
+                                        <span class="room">Lab 301</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="14:00" data-subject="History">
+                                    <div class="time-slot">14:00 - 15:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">History</span>
+                                        <span class="teacher">Prof. Brown</span>
+                                        <span class="room">Room 203</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tuesday -->
+                        <div class="schedule-day">
+                            <h3 class="day-title">Tuesday</h3>
+                            <div class="schedule-items">
+                                <div class="schedule-item" data-time="09:00" data-subject="English">
+                                    <div class="time-slot">09:00 - 10:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">English</span>
+                                        <span class="teacher">Ms. Williams</span>
+                                        <span class="room">Room 105</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="10:15" data-subject="Mathematics">
+                                    <div class="time-slot">10:15 - 11:15</div>
+                                    <div class="class-info">
+                                        <span class="subject">Mathematics</span>
+                                        <span class="teacher">Mr. Johnson</span>
+                                        <span class="room">Room 201</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="11:30" data-subject="Physical Education">
+                                    <div class="time-slot">11:30 - 12:30</div>
+                                    <div class="class-info">
+                                        <span class="subject">Physical Education</span>
+                                        <span class="teacher">Coach Davis</span>
+                                        <span class="room">Gym</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Wednesday -->
+                        <div class="schedule-day">
+                            <h3 class="day-title">Wednesday</h3>
+                            <div class="schedule-items">
+                                <div class="schedule-item" data-time="09:00" data-subject="Science">
+                                    <div class="time-slot">09:00 - 10:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">Science</span>
+                                        <span class="teacher">Dr. Smith</span>
+                                        <span class="room">Lab 301</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="10:15" data-subject="History">
+                                    <div class="time-slot">10:15 - 11:15</div>
+                                    <div class="class-info">
+                                        <span class="subject">History</span>
+                                        <span class="teacher">Prof. Brown</span>
+                                        <span class="room">Room 203</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="11:30" data-subject="Mathematics">
+                                    <div class="time-slot">11:30 - 12:30</div>
+                                    <div class="class-info">
+                                        <span class="subject">Mathematics</span>
+                                        <span class="teacher">Mr. Johnson</span>
+                                        <span class="room">Room 201</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thursday -->
+                        <div class="schedule-day">
+                            <h3 class="day-title">Thursday</h3>
+                            <div class="schedule-items">
+                                <div class="schedule-item" data-time="09:00" data-subject="Mathematics">
+                                    <div class="time-slot">09:00 - 10:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">Mathematics</span>
+                                        <span class="teacher">Mr. Johnson</span>
+                                        <span class="room">Room 201</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="10:15" data-subject="English">
+                                    <div class="time-slot">10:15 - 11:15</div>
+                                    <div class="class-info">
+                                        <span class="subject">English</span>
+                                        <span class="teacher">Ms. Williams</span>
+                                        <span class="room">Room 105</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="11:30" data-subject="Science">
+                                    <div class="time-slot">11:30 - 12:30</div>
+                                    <div class="class-info">
+                                        <span class="subject">Science</span>
+                                        <span class="teacher">Dr. Smith</span>
+                                        <span class="room">Lab 301</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Friday -->
+                        <div class="schedule-day">
+                            <h3 class="day-title">Friday</h3>
+                            <div class="schedule-items">
+                                <div class="schedule-item" data-time="09:00" data-subject="History">
+                                    <div class="time-slot">09:00 - 10:00</div>
+                                    <div class="class-info">
+                                        <span class="subject">History</span>
+                                        <span class="teacher">Prof. Brown</span>
+                                        <span class="room">Room 203</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="10:15" data-subject="Mathematics">
+                                    <div class="time-slot">10:15 - 11:15</div>
+                                    <div class="class-info">
+                                        <span class="subject">Mathematics</span>
+                                        <span class="teacher">Mr. Johnson</span>
+                                        <span class="room">Room 201</span>
+                                    </div>
+                                </div>
+                                <div class="schedule-item" data-time="11:30" data-subject="English">
+                                    <div class="time-slot">11:30 - 12:30</div>
+                                    <div class="class-info">
+                                        <span class="subject">English</span>
+                                        <span class="teacher">Ms. Williams</span>
+                                        <span class="room">Room 105</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
+

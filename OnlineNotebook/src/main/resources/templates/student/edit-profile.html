@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit Profile - School Notebook</title>
+    <link rel="stylesheet" href="/css/edit-profile.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main class="container">
+        <section class="edit-profile-card">
+            <div class="edit-header">
+                <div class="logo" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#2563eb"/>
+                        <path d="M8 7H14" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#2563eb" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <h1 class="title">Edit Profile</h1>
+                <p class="subtitle">Update your personal information and settings.</p>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success" style="margin-bottom: 20px; padding: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; color: #10b981;">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <div th:if="${errorMessage}" class="alert alert-error" style="margin-bottom: 20px; padding: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; color: #ef4444;">
+                <span th:text="${errorMessage}"></span>
+            </div>
+
+            <form class="edit-form" id="editProfileForm" th:action="@{/student/edit-profile}" th:object="${editProfileDto}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <!-- Profile Picture URL -->
+                <div class="profile-picture-section">
+                    <div class="current-avatar" th:data-user-avatar="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}" th:style="${user.profilePictureUrl != null and user.profilePictureUrl != ''} ? 'background-image: url(' + ${user.profilePictureUrl} + '); background-size: cover; background-position: center;' : ''">
+                        <span class="avatar-text" th:style="${user.profilePictureUrl != null and user.profilePictureUrl != ''} ? 'display: none;' : ''" th:text="${user.firstName.substring(0,1) + user.lastName.substring(0,1)}">JD</span>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="profilePictureUrl" class="form-label">Profile Picture URL</label>
+                        <input
+                            type="url"
+                            id="profilePictureUrl"
+                            name="profilePictureUrl"
+                            class="form-input"
+                            placeholder="https://example.com/your-photo.jpg"
+                            th:field="*{profilePictureUrl}"
+                            onchange="updateAvatarPreview(this.value)"
+                        />
+                        <span class="form-hint">Enter a URL to your profile picture</span>
+                    </div>
+                </div>
+
+                <!-- Name Fields -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            class="form-input"
+                            placeholder="Enter your first name"
+                            th:field="*{firstName}"
+                            required
+                        >
+                        <div th:if="${#fields.hasErrors('firstName')}" class="error-message" th:errors="*{firstName}"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            class="form-input"
+                            placeholder="Enter your last name"
+                            th:field="*{lastName}"
+                            required
+                        >
+                        <div th:if="${#fields.hasErrors('lastName')}" class="error-message" th:errors="*{lastName}"></div>
+                    </div>
+                </div>
+
+                <!-- Email (Read-only) -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        th:value="${user.email}"
+                        readonly
+                        disabled
+                    >
+                    <span class="field-hint">Email cannot be changed</span>
+                </div>
+
+                <!-- Password Section -->
+                <div class="password-section">
+                    <h3 class="section-title">Change Password</h3>
+                    <p class="section-hint">Leave blank to keep your current password</p>
+                    
+                    <div class="form-group">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <div class="password-input-wrapper">
+                            <input
+                                type="password"
+                                id="currentPassword"
+                                name="currentPassword"
+                                class="form-input"
+                                placeholder="Enter current password"
+                                th:field="*{currentPassword}"
+                            >
+                            <button type="button" class="password-toggle" data-target="currentPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <div class="password-input-wrapper">
+                            <input
+                                type="password"
+                                id="newPassword"
+                                name="newPassword"
+                                class="form-input"
+                                placeholder="Enter new password"
+                                th:field="*{newPassword}"
+                            >
+                            <div th:if="${#fields.hasErrors('newPassword')}" class="error-message" th:errors="*{newPassword}"></div>
+                            <button type="button" class="password-toggle" data-target="newPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <div class="password-input-wrapper">
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                class="form-input"
+                                placeholder="Confirm new password"
+                                th:field="*{confirmPassword}"
+                            >
+                            <div th:if="${#fields.hasErrors('confirmPassword')}" class="error-message" th:errors="*{confirmPassword}"></div>
+                            <button type="button" class="password-toggle" data-target="confirmPassword">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Password toggle functionality
+            const toggleButtons = document.querySelectorAll('.password-toggle');
+            
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const svg = this.querySelector('svg');
+                    
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        svg.innerHTML = `
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        `;
+                    } else {
+                        input.type = 'password';
+                        svg.innerHTML = `
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        `;
+                    }
+                });
+            });
+
+            // Profile picture URL preview
+            function updateAvatarPreview(url) {
+                const currentAvatar = document.querySelector('.current-avatar');
+                const avatarText = currentAvatar.querySelector('.avatar-text');
+                if (url && url.trim() !== '') {
+                    currentAvatar.style.backgroundImage = `url(${url})`;
+                    currentAvatar.style.backgroundSize = 'cover';
+                    currentAvatar.style.backgroundPosition = 'center';
+                    if (avatarText) {
+                        avatarText.style.display = 'none';
+                    }
+                } else {
+                    currentAvatar.style.backgroundImage = '';
+                    if (avatarText) {
+                        avatarText.style.display = '';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home - School Notebook</title>
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#7c3aed"/>
+                        <path d="M8 7H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#7c3aed" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <span class="nav-title">School Notebook</span>
+            </div>
+            
+            <div class="nav-menu">
+                <a href="/student/home" class="nav-link active" data-section="home">Home</a>
+                <a href="/student/grades" class="nav-link" data-section="grades">Grades</a>
+            </div>
+            
+            <div class="nav-user">
+                <div class="user-avatar" th:data-user-id="${homeView.profile.id}" th:data-user-avatar="${homeView.profile.initials}" th:style="${homeView.profile.profilePictureUrl != null and !#strings.isEmpty(homeView.profile.profilePictureUrl)} ? |background-image: url(${homeView.profile.profilePictureUrl}); background-size: cover; background-position: center;| : ''">
+                    <span class="avatar-text" th:style="${homeView.profile.profilePictureUrl != null and !#strings.isEmpty(homeView.profile.profilePictureUrl)} ? 'display: none;' : ''" th:text="${homeView.profile.initials}">JD</span>
+                </div>
+                <div class="user-menu">
+                    <span class="user-name" data-user-name="John Doe" th:text="${homeView.profile.firstName + ' ' + homeView.profile.lastName}">John Doe</span>
+                    <span class="user-role" data-user-role="student">Student</span>
+                </div>
+                <form action="/logout" method="post" style="display: inline;" id="logoutForm">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button type="submit" class="logout-btn" data-action="logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="16,17 21,12 16,7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+           <!-- Main Content -->
+           <main class="main-content">
+               <!-- Success/Error Messages -->
+               <div th:if="${successMessage != null}" class="status-banner success" style="margin-bottom: 24px; padding: 16px 24px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-weight: 500;">
+                   <span th:text="${successMessage}"></span>
+               </div>
+               <div th:if="${errorMessage != null}" class="status-banner error" style="margin-bottom: 24px; padding: 16px 24px; border-radius: 12px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-weight: 500;">
+                   <span th:text="${errorMessage}"></span>
+               </div>
+
+               <!-- Student Info Header -->
+               <section class="student-overview" style="margin-bottom: 56px;">
+                   <div class="student-header">
+                           <div class="student-info" th:if="${homeView != null}">
+                           <div class="avatar-container">
+                               <div class="student-avatar" th:data-student-id="${homeView.profile.id}" th:data-user-avatar="${homeView.profile.initials}" th:style="${homeView.profile.profilePictureUrl != null and !#strings.isEmpty(homeView.profile.profilePictureUrl)} ? |background-image: url(${homeView.profile.profilePictureUrl}); background-size: cover; background-position: center;| : ''">
+                                   <span class="avatar-text-large" th:style="${homeView.profile.profilePictureUrl != null and !#strings.isEmpty(homeView.profile.profilePictureUrl)} ? 'display: none;' : ''" th:text="${homeView.profile.initials}">JD</span>
+                               </div>
+                               <a href="/student/edit-profile" class="edit-avatar-btn" title="Edit Profile">
+                                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                   </svg>
+                               </a>
+                           </div>
+                           <div class="student-details">
+                               <h1 th:text="${homeView.profile.firstName + ' ' + homeView.profile.lastName}" class="student-name" data-student-name="John Doe">John Doe</h1>
+                               <div class="student-meta">
+                                   <span th:text="${homeView.profile.studentClass != null ? homeView.profile.studentClass : 'Class not set'}" class="student-class" data-class="Grade 10A">Grade 10A</span>
+                                   <span th:text="${homeView.profile.displayId}" class="student-id" data-student-id="STU-2024-001">ID: STU-2024-001</span>
+                               </div>
+                           </div>
+                       </div>
+                       
+                       <div class="quick-stats">
+                           <div class="stat-card stat-card--highlight stat-grade" data-stat="grade">
+                               <div class="stat-icon">
+                                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M12 3L14.09 8.26L19.82 8.27L15.18 11.74L17.27 17L12 13.52L6.73 17L8.82 11.74L4.18 8.27L9.91 8.26L12 3Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                   </svg>
+                               </div>
+                               <div class="stat-content">
+                                   <span class="stat-label">Average Grade</span>
+                                   <span class="stat-value" th:text="${homeView.quickStats.averageGradeDisplay}">5.67</span>
+                                   <span class="stat-caption">Scale 2 – 6</span>
+                               </div>
+                           </div>
+                           <div class="stat-card stat-card--highlight stat-attendance" data-stat="attendance">
+                               <div class="stat-icon">
+                                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M12 5V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                       <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5"/>
+                                   </svg>
+                               </div>
+                               <div class="stat-content">
+                                   <span class="stat-label">Attendance Rate</span>
+                                   <span class="stat-value" th:text="${homeView.quickStats.attendanceDisplay}">95%</span>
+                                   <span class="stat-caption">Current term</span>
+                               </div>
+                           </div>
+                           <div class="stat-card stat-card--highlight stat-assignments" data-stat="assignments">
+                               <div class="stat-icon">
+                                   <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                       <path d="M7 3H17V21H7C5.89543 21 5 20.1046 5 19V5C5 3.89543 5.89543 3 7 3Z" stroke="currentColor" stroke-width="1.5"/>
+                                       <path d="M9 7H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                       <path d="M9 11H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                       <path d="M9 15H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                   </svg>
+                               </div>
+                               <div class="stat-content">
+                                   <span class="stat-label">Pending Tasks</span>
+                                   <span class="stat-value" th:text="${homeView.quickStats.pendingAssignments}">12</span>
+                                   <span class="stat-caption">Assignments</span>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </section>
+
+        <!-- Home Grid -->
+        <section class="home-grid">
+            <!-- Recent Grades -->
+            <div class="home-card grades-card" data-card="recent-grades">
+                <div class="card-header">
+                    <h2 class="card-title">Recent Grades</h2>
+                    <a href="/student/grades" class="card-action">View All</a>
+                </div>
+                <div class="card-content">
+                    <div class="grades-list" data-grades="recent">
+                        <div class="grade-item" th:each="grade : ${homeView.recentGrades}" th:data-subject="${grade.subject}" th:data-grade="${grade.gradeValue}">
+                            <div class="subject-info">
+                                <span class="subject-name" th:text="${grade.subject}">Mathematics</span>
+                                <span class="assignment-name" th:text="${grade.assignment}">Algebra Test</span>
+                            </div>
+                            <div class="grade-badge" th:class="${grade.gradeValue == 6} ? 'grade-badge grade-6' : (${grade.gradeValue == 5} ? 'grade-badge grade-5' : (${grade.gradeValue == 4} ? 'grade-badge grade-4' : (${grade.gradeValue == 3} ? 'grade-badge grade-3' : (${grade.gradeValue == 2} ? 'grade-badge grade-2' : 'grade-badge grade-na'))))" th:text="${grade.gradeValue != null ? grade.gradeValue : '--'}">6</div>
+                        </div>
+                        <div class="empty-state" th:if="${#lists.isEmpty(homeView.recentGrades)}">No grades have been posted yet.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- My Assignments -->
+            <div class="home-card assignments-card" data-card="assignments">
+                <div class="card-header">
+                    <h2 class="card-title">My Assignments</h2>
+                    <span class="card-subtitle" th:if="${homeView.upcomingAssignments != null}">
+                        <span th:text="${#lists.size(homeView.upcomingAssignments)}">0</span> upcoming
+                    </span>
+                </div>
+                <div class="card-content">
+                    <div class="assignments-grid" th:if="${homeView.upcomingAssignments != null and !#lists.isEmpty(homeView.upcomingAssignments)}">
+                        <div class="assignment-card" th:each="assignment : ${homeView.upcomingAssignments}" th:data-priority="${assignment.priorityLevel}">
+                            <div class="assignment-card-header">
+                                <div class="assignment-type-badge" th:text="${assignment.assignmentType}">Homework</div>
+                                <div class="assignment-priority" th:class="${assignment.priorityLevel == 'high'} ? 'priority-high' : (${assignment.priorityLevel == 'medium'} ? 'priority-medium' : 'priority-low')">
+                                    <span th:text="${assignment.priorityLabel}">High</span>
+                                </div>
+                            </div>
+                            <div class="assignment-card-body">
+                                <h3 class="assignment-title" th:text="${assignment.title}">Assignment Title</h3>
+                                <p class="assignment-description" th:if="${assignment.description != null and !#strings.isEmpty(assignment.description)}" th:text="${assignment.description}">Assignment description goes here...</p>
+                                <p class="assignment-description text-muted" th:unless="${assignment.description != null and !#strings.isEmpty(assignment.description)}">No description provided.</p>
+                                <div class="assignment-meta">
+                                    <div class="meta-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/>
+                                        </svg>
+                                        <span class="due-date" th:text="${assignment.dueDateText}">Due: Oct 15</span>
+                                    </div>
+                                    <div class="meta-item">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/>
+                                        </svg>
+                                        <span class="assignment-subject" th:text="${assignment.subject}">Subject</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-state" th:if="${homeView.upcomingAssignments == null}">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.5; margin-bottom: 16px;">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
+                        </svg>
+                        <h3>No assignments yet</h3>
+                        <p>Your teacher hasn't posted any assignments for your course. Check back later!</p>
+                    </div>
+                    <div class="empty-state" th:if="${homeView.upcomingAssignments != null and #lists.isEmpty(homeView.upcomingAssignments)}">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity: 0.5; margin-bottom: 16px;">
+                            <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" fill="currentColor"/>
+                        </svg>
+                        <h3>No assignments yet</h3>
+                        <p>Your teacher hasn't posted any assignments for your course. Check back later!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grade Overview -->
+            <div class="home-card grade-overview-card" data-card="grade-overview">
+                <div class="card-header">
+                    <h2 class="card-title">Grade Overview</h2>
+                </div>
+                <div class="card-content">
+                    <div class="grade-chart" data-chart="subject-grades">
+                        <div class="subject-grade" th:each="subjectGrade : ${homeView.subjectGrades}" th:data-subject="${subjectGrade.subject}">
+                            <div class="subject-header">
+                                <span class="subject-name" th:text="${subjectGrade.subject}">Mathematics</span>
+                                <span class="grade-value" th:text="${subjectGrade.gradeDisplay}">6 (95%)</span>
+                            </div>
+                            <div class="grade-bar">
+                                <div class="grade-fill" th:style="'width:' + subjectGrade.percentage + '%'"></div>
+                            </div>
+                        </div>
+                        <div class="empty-state" th:if="${#lists.isEmpty(homeView.subjectGrades)}">No subject grades available yet.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Records -->
+            <div class="home-card attendance-card" data-card="attendance-records">
+                <div class="card-header">
+                    <h2 class="card-title">My Attendance</h2>
+                </div>
+                <div class="card-content">
+                    <div th:if="${homeView.attendances != null and !#lists.isEmpty(homeView.attendances)}" class="attendance-list">
+                        <div class="attendance-item" th:each="attendance : ${homeView.attendances}">
+                            <div class="attendance-info">
+                                <div th:if="${attendance.status != null}">
+                                    <div class="attendance-status status-absent" th:if="${attendance.status.name() == 'ABSENT'}">
+                                        <span th:text="${attendance.status.displayType}">Absent</span>
+                                    </div>
+                                    <div class="attendance-status status-late" th:if="${attendance.status.name() != 'ABSENT'}">
+                                        <span th:text="${attendance.status.displayType}">Late</span>
+                                    </div>
+                                </div>
+                                <div class="attendance-status status-late" th:if="${attendance.status == null}">
+                                    <span>N/A</span>
+                                </div>
+                                <div class="attendance-details">
+                                    <span class="attendance-date" th:if="${attendance.createdAt != null}" th:text="${#temporals.format(attendance.createdAt, 'MMM d, yyyy HH:mm')}">Nov 15, 2024 10:30</span>
+                                    <span class="attendance-date" th:if="${attendance.createdAt == null}">N/A</span>
+                                    <span class="attendance-course" th:text="${attendance.studentCourse != null ? attendance.studentCourse : 'N/A'}">Mathematics</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="empty-state" th:if="${homeView.attendances == null}">No attendance records yet.</div>
+                    <div class="empty-state" th:if="${homeView.attendances != null and #lists.isEmpty(homeView.attendances)}">No attendance records yet.</div>
+                </div>
+            </div>
+
+            <!-- School Leaderboard -->
+            <div class="home-card leaderboard-card" data-card="school-leaderboard">
+                <div class="card-header">
+                    <h2 class="card-title">School Leaderboard</h2>
+                </div>
+                <div class="card-content">
+                    <div class="leaderboard-list" data-leaderboard="school">
+                        <div class="leaderboard-item" th:each="entry : ${homeView.leaderboard}" th:data-rank="${entry.rank}" th:classappend="${entry.currentUser} ? ' current-user'">
+                            <div class="rank-badge" th:class="${entry.rank == 1} ? 'rank-badge rank-1' : (${entry.rank == 2} ? 'rank-badge rank-2' : (${entry.rank == 3} ? 'rank-badge rank-3' : 'rank-badge rank-other'))" th:text="${entry.rank}">1</div>
+                            <div class="student-info">
+                                <div class="student-avatar-small">
+                                    <span class="avatar-text-small" th:text="${entry.initials}">AS</span>
+                                </div>
+                                <div class="student-details">
+                                    <span class="student-name" th:text="${entry.fullName}">Anna Smith</span>
+                                    <span class="student-class" th:text="${entry.className != null ? entry.className : 'Class not set'}">Grade 10A</span>
+                                </div>
+                            </div>
+                            <div class="stats-display">
+                                <div class="stat-item">
+                                    <span class="stat-label">Grade</span>
+                                    <span class="stat-value grade-value" th:text="${entry.gradeDisplay}">5.89</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Attendance</span>
+                                    <span class="stat-value attendance-value" th:text="${entry.attendanceDisplay}">2A/1L</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="empty-state" th:if="${#lists.isEmpty(homeView.leaderboard)}">No leaderboard data available.</div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+</body>
+</html>
+

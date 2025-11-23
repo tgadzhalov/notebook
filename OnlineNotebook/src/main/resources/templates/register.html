@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register - School Notebook</title>
+    <link rel="stylesheet" href="/css/register.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+    <main class="container">
+        <section class="register-card">
+            <div class="register-header">
+                <div class="logo" aria-hidden="true">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="5" y="3" width="12" height="18" rx="2.5" fill="#ffffff" stroke="#6366f1"/>
+                        <path d="M8 7H14" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 11H14" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M8 15H12" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M17 3V19" stroke="#6366f1" stroke-width="1.5"/>
+                    </svg>
+                </div>
+                <h1 class="title">Create Account</h1>
+            </div>
+
+            <form th:action="@{/register}" method="post" th:object="${registerDto}" class="register-form" id="registerForm" novalidate>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input
+                            type="text" 
+                            id="firstName" 
+                            class="form-input" 
+                            placeholder="Enter first name"
+                            required
+                            th:field="*{firstName}"
+                        >
+                        <div class="requirement-text">2-25 chars</div>
+                        <div class="error-message" id="firstNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            class="form-input" 
+                            placeholder="Enter last name"
+                            required
+                            th:field="*{lastName}"
+                        >
+                        <div class="requirement-text">2-25 chars</div>
+                        <div class="error-message" id="lastNameError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="Enter your email"
+                        required
+                        autocomplete="email"
+                        th:field="*{email}"
+                    >
+                    <div class="error-message" id="emailError"></div>
+                    <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="field-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="password-input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            class="form-input" 
+                            placeholder="Create a password"
+                            required
+                            autocomplete="new-password"
+                            th:field="*{password}"
+                        >
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="requirement-text">8-50 chars</div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="form-label">Select Your Role</label>
+                    <div class="role-selection">
+                        <div class="role-option" data-role="STUDENT">
+                            <div class="role-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5 13.18V17.18L12 21L19 17.18V13.18L12 17L5 13.18Z" fill="currentColor"/>
+                                    <path d="M12 3L1 9L12 15L21 10.09V17H23V9L12 3Z" fill="currentColor"/>
+                                    <circle cx="12" cy="8" r="2" fill="currentColor"/>
+                                    <path d="M12 10C9.79 10 8 11.79 8 14V16H16V14C16 11.79 14.21 10 12 10Z" fill="currentColor"/>
+                                </svg>
+                            </div>
+                            <div class="role-content">
+                                <h3 class="role-title">Student</h3>
+                            </div>
+                        </div>
+                        
+                        <div class="role-option" data-role="TEACHER">
+                            <div class="role-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="7" r="3" fill="currentColor"/>
+                                    <path d="M12 11C8.13 11 5 14.13 5 18V20H19V18C19 14.13 15.87 11 12 11Z" fill="currentColor"/>
+                                    <rect x="2" y="4" width="4" height="3" rx="0.5" fill="currentColor"/>
+                                    <rect x="18" y="4" width="4" height="3" rx="0.5" fill="currentColor"/>
+                                    <rect x="6" y="2" width="12" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                                    <line x1="8" y1="5" x2="16" y2="5" stroke="currentColor" stroke-width="1"/>
+                                    <line x1="8" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1"/>
+                                </svg>
+                            </div>
+                            <div class="role-content">
+                                <h3 class="role-title">Teacher</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="role" name="userType" required th:field="*{userType}">
+                    <div class="error-message" id="roleError"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full" id="registerBtn">
+                    <span class="btn-text">Create Account</span>
+                    <div class="btn-spinner" style="display: none;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+                                <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                    </div>
+                </button>
+            </form>
+
+            <div class="register-footer">
+                <p class="login-text">Already have an account? <a href="/login" class="login-link">Sign in here</a></p>
+                <a href="/" class="back-link">← Back to home</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Role selection functionality and field validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleOptions = document.querySelectorAll('.role-option');
+            const roleInput = document.getElementById('role');
+            const roleError = document.getElementById('roleError');
+            const formInputs = document.querySelectorAll('.form-input');
+
+            // Password visibility toggle
+            const passwordInput = document.getElementById('password');
+            const passwordToggle = document.getElementById('passwordToggle');
+            
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function() {
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                });
+            }
+
+            // Add visual feedback when fields are filled
+            formInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        this.classList.add('filled');
+                    } else {
+                        this.classList.remove('filled');
+                    }
+                });
+
+                // Check initial state
+                if (input.value.trim() !== '') {
+                    input.classList.add('filled');
+                }
+            });
+
+            roleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    roleOptions.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Set the hidden input value
+                    roleInput.value = this.dataset.role;
+                    
+                    // Clear any error message
+                    roleError.textContent = '';
+                    
+                    // Trigger validation
+                    roleInput.dispatchEvent(new Event('change'));
+                });
+            });
+
+            // Form validation
+            const form = document.getElementById('registerForm');
+            form.addEventListener('submit', function(e) {
+                let isValid = true;
+
+                // Validate role selection
+                if (!roleInput.value) {
+                    roleError.textContent = 'Please select a role';
+                    isValid = false;
+                }
+
+                // Validate field lengths
+                const firstName = document.getElementById('firstName');
+                const lastName = document.getElementById('lastName');
+                const password = document.getElementById('password');
+
+                if (firstName.value.length < 2 || firstName.value.length > 25) {
+                    document.getElementById('firstNameError').textContent = 'First name must be 2-25 characters';
+                    isValid = false;
+                }
+
+                if (lastName.value.length < 2 || lastName.value.length > 25) {
+                    document.getElementById('lastNameError').textContent = 'Last name must be 2-25 characters';
+                    isValid = false;
+                }
+
+                if (password.value.length < 8 || password.value.length > 50) {
+                    document.getElementById('passwordError').textContent = 'Password must be 8-50 characters';
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
