@@ -16,6 +16,9 @@ import com.example.OnlineNotebook.models.enums.UserType;
 import com.example.OnlineNotebook.repositories.CourseRepository;
 import com.example.OnlineNotebook.repositories.GradeRepository;
 import com.example.OnlineNotebook.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,9 +32,9 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class GradeService {
-    
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final GradeRepository gradeRepository;
@@ -117,7 +120,10 @@ public class GradeService {
     }
     
     @Transactional
+    @CacheEvict(value = {"grades", "studentHome"}, allEntries = true)
     public void saveGrades(SaveGradesDto saveGradesDto, User teacher) {
+        log.info("Saving grades - teacherId: {}, courseId: {}, assignmentId: {}", 
+            teacher.getId(), saveGradesDto.getCourseId(), saveGradesDto.getAssignmentId());
         Course course = courseRepository.findById(saveGradesDto.getCourseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
         
@@ -204,8 +210,10 @@ public class GradeService {
                 gradeRepository.save(grade);
             }
         }
+        log.info("Grades saved successfully for courseId: {}", saveGradesDto.getCourseId());
     }
 
+    @Cacheable(value = "grades", key = "#teacher.id + '_' + #studentId + '_' + #courseId")
     public List<TeacherStudentGradeDto> getStudentGradesForTeacher(User teacher, UUID studentId, UUID courseId) {
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found"));
@@ -275,6 +283,7 @@ public class GradeService {
 
     @Transactional
     public void deleteGradeForTeacher(User teacher, UUID gradeId) {
+        log.info("Deleting grade - teacherId: {}, gradeId: {}", teacher.getId(), gradeId);
         Grade grade = gradeRepository.findById(gradeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grade not found"));
 
@@ -293,10 +302,12 @@ public class GradeService {
         }
 
         gradeRepository.delete(grade);
+        log.info("Grade deleted successfully - gradeId: {}", gradeId);
     }
 
     @Transactional
     public void updateGradeFeedback(User teacher, UUID gradeId, UpdateGradeFeedbackDto updateDto) {
+        log.info("Updating grade feedback - teacherId: {}, gradeId: {}", teacher.getId(), gradeId);
         Grade grade = gradeRepository.findById(gradeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grade not found"));
 
@@ -317,5 +328,6 @@ public class GradeService {
         String feedback = updateDto != null ? updateDto.getFeedback() : null;
         grade.setFeedback(feedback != null && !feedback.isBlank() ? feedback.trim() : null);
         gradeRepository.save(grade);
+        log.info("Grade feedback updated successfully - gradeId: {}", gradeId);
     }
 }

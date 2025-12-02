@@ -16,6 +16,7 @@ import com.example.OnlineNotebook.models.enums.GradeLetter;
 import com.example.OnlineNotebook.models.enums.SubjectType;
 import com.example.OnlineNotebook.repositories.AssignmentRepository;
 import com.example.OnlineNotebook.repositories.GradeRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -46,6 +47,7 @@ public class StudentHomeService {
         this.assignmentRepository = assignmentRepository;
     }
 
+    @Cacheable(value = "studentHome", key = "#studentId")
     public StudentHomeViewDto buildHomeView(UUID studentId) {
         User student = userService.getById(studentId);
         List<Grade> grades = gradeRepository.findByStudent(student);

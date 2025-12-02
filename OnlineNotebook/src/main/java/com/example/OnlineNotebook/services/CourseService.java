@@ -8,6 +8,9 @@ import com.example.OnlineNotebook.models.enums.UserType;
 import com.example.OnlineNotebook.repositories.CourseRepository;
 import com.example.OnlineNotebook.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,9 +21,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CourseService {
-    
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     
@@ -30,7 +33,9 @@ public class CourseService {
     }
     
     @Transactional
+    @CacheEvict(value = {"courses", "students", "studentHome"}, allEntries = true)
     public Course createCourse(CourseDto courseDto) {
+        log.info("Creating course: {} for teacherId: {}", courseDto.getName(), courseDto.getTeacherId());
         User teacher = userRepository.findById(courseDto.getTeacherId())
                 .orElseThrow(() -> new ResourceNotFoundException("Teacher not found with ID: " + courseDto.getTeacherId()));
         
@@ -49,7 +54,9 @@ public class CourseService {
         
         course.setSubjects(courseDto.getSubjects() != null ? new ArrayList<>(courseDto.getSubjects()) : new ArrayList<>());
         
-        return courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+        log.info("Course created successfully with id: {}, name: {}", savedCourse.getId(), savedCourse.getName());
+        return savedCourse;
     }
     
     public List<User> getTeachers() {
@@ -60,6 +67,7 @@ public class CourseService {
         return courseRepository.findById(courseId).orElse(null);
     }
     
+    @Cacheable(value = "courses", key = "#teacher.id")
     public List<Course> getCoursesByTeacher(User teacher) {
         return courseRepository.findByTeacher(teacher);
     }

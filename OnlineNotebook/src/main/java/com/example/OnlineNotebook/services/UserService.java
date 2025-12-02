@@ -18,8 +18,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,9 +30,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserService implements UserDetailsService {
-
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CourseRepository courseRepository;
@@ -50,9 +52,10 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void registerUser(RegisterDto registerDto) {
         if (emailExists(registerDto.getEmail())) {
+            log.warn("Registration attempt with existing email: {}", registerDto.getEmail());
             throw new IllegalArgumentException("Email already exists: " + registerDto.getEmail());
         }
-
+        log.info("Registering new user with email: {}, type: {}", registerDto.getEmail(), registerDto.getUserType());
         User user = User.builder()
                 .firstName(registerDto.getFirstName())
                 .lastName(registerDto.getLastName())
@@ -64,6 +67,7 @@ public class UserService implements UserDetailsService {
                 .build();
 
         userRepository.save(user);
+        log.info("User registered successfully with email: {}", registerDto.getEmail());
     }
 
     public UserRegistrationResult registerUserWithResult(RegisterDto registerDto) {
@@ -77,9 +81,10 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void registerUserFromBulkImport(BulkImportUserDto bulkImportDto) {
         if (emailExists(bulkImportDto.getEmail())) {
+            log.warn("Bulk import: email already exists: {}", bulkImportDto.getEmail());
             throw new IllegalArgumentException("Email already exists: " + bulkImportDto.getEmail());
         }
-
+        log.debug("Bulk importing user with email: {}", bulkImportDto.getEmail());
         User user = User.builder()
                 .firstName(bulkImportDto.getFirstName())
                 .lastName(bulkImportDto.getLastName())
@@ -154,6 +159,7 @@ public class UserService implements UserDetailsService {
                 .collect(Collectors.toList());
     }
     
+    @Cacheable(value = "students", key = "#course.id")
     public List<User> getStudentsByCourse(Course course) {
         return userRepository.findByCourse(course).stream()
                 .filter(user -> user.getUserType() == UserType.STUDENT)
@@ -183,6 +189,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void updateUserProfile(UUID userId, EditProfileDto editProfileDto) {
+        log.info("Updating profile for userId: {}", userId);
         User user = getById(userId);
 
         validatePasswordChange(editProfileDto, user);
@@ -218,6 +225,7 @@ public class UserService implements UserDetailsService {
 
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
+        log.info("Profile updated successfully for userId: {}", userId);
     }
 
     private void validatePasswordChange(EditProfileDto editProfileDto, User user) {

@@ -8,14 +8,15 @@ import com.example.OnlineNotebook.exceptions.ResourceNotFoundException;
 import com.example.OnlineNotebook.models.dtos.teacher.attendance.TeacherAttendanceViewDto;
 import com.example.OnlineNotebook.models.entities.Course;
 import com.example.OnlineNotebook.models.entities.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class AttendanceService {
-
     private final AttendanceClientService clientAttendanceService;
     private final CourseService courseService;
     private final UserService userService;
@@ -76,6 +77,8 @@ public class AttendanceService {
     }
 
     public void markAttendance(UUID teacherId, UUID studentId, UUID courseId, String status) {
+        log.info("Marking attendance - teacherId: {}, studentId: {}, courseId: {}, status: {}", 
+            teacherId, studentId, courseId, status);
         User student = userService.getById(studentId);
         Course course = courseService.getCourseById(courseId);
         
@@ -91,10 +94,13 @@ public class AttendanceService {
                 .build();
 
         clientAttendanceService.saveAttendance(teacherId, requestDto);
+        log.info("Attendance marked successfully for studentId: {}", studentId);
     }
 
     public void deleteAttendanceRecord(UUID teacherId, UUID attendanceId) {
+        log.info("Deleting attendance record - teacherId: {}, attendanceId: {}", teacherId, attendanceId);
         clientAttendanceService.deleteAttendance(teacherId, attendanceId);
+        log.info("Attendance record deleted successfully - attendanceId: {}", attendanceId);
     }
 }
 

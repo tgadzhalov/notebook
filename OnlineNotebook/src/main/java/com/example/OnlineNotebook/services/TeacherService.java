@@ -12,6 +12,8 @@ import com.example.OnlineNotebook.models.entities.Course;
 import com.example.OnlineNotebook.models.entities.User;
 import com.example.OnlineNotebook.models.enums.AssignmentType;
 import com.example.OnlineNotebook.repositories.AssignmentRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -22,9 +24,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class TeacherService {
-
     private final CourseService courseService;
     private final UserService userService;
     private final AssignmentRepository assignmentRepository;
@@ -145,7 +147,10 @@ public class TeacherService {
                 .build();
     }
 
+    @CacheEvict(value = {"assignments", "studentHome"}, allEntries = true)
     public Assignment createAssignment(AssignmentFormDto assignmentFormDto, User teacher) {
+        log.info("Creating assignment - teacherId: {}, title: {}, courseId: {}", 
+            teacher.getId(), assignmentFormDto.getTitle(), assignmentFormDto.getCourseId());
         if (assignmentFormDto.getCourseId() == null) {
             throw new IllegalArgumentException("Course is required.");
         }
@@ -173,10 +178,14 @@ public class TeacherService {
                 .course(course)
                 .build();
 
-        return assignmentRepository.save(assignment);
+        Assignment savedAssignment = assignmentRepository.save(assignment);
+        log.info("Assignment created successfully with id: {}", savedAssignment.getId());
+        return savedAssignment;
     }
 
+    @CacheEvict(value = {"assignments", "studentHome"}, allEntries = true)
     public void deleteAssignment(UUID assignmentId, User teacher) {
+        log.info("Deleting assignment - teacherId: {}, assignmentId: {}", teacher.getId(), assignmentId);
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Assignment not found."));
 
@@ -185,6 +194,7 @@ public class TeacherService {
         }
 
         assignmentRepository.delete(assignment);
+        log.info("Assignment deleted successfully - assignmentId: {}", assignmentId);
     }
 
 }
