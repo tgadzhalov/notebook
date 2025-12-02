@@ -29,12 +29,22 @@ cd notebook/OnlineNotebook
    CREATE DATABASE IF NOT EXISTS notebook;
    ```
 
-3. **Update database credentials** in `src/main/resources/application.properties`:
+3. **Configure database credentials** in `src/main/resources/application.properties`:
+   
+   **Option 1: Set environment variables (recommended)**
+   ```bash
+   export DB_USERNAME=your_username
+   export DB_PASSWORD=your_password
+   ```
+   
+   **Option 2: Update application.properties directly**
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/notebook?createDatabaseIfNotExist=true
    spring.datasource.username=your_username
    spring.datasource.password=your_password
    ```
+   
+   **Note**: The application uses environment variables by default. If not set, it will use `root` for username and empty password. Make sure to configure these before running.
 
 ### 3. JWT Configuration
 
