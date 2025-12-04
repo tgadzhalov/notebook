@@ -510,16 +510,15 @@
                     <div th:if="${#lists.isEmpty(studentGrades)}" class="grade-empty-state">
                         <p>No grades recorded for this student yet.</p>
                     </div>
-                    <div th:if="${!#lists.isEmpty(studentGrades)}" class="grade-list">
-                        <div th:each="grade : ${studentGrades}" class="grade-item">
-                            <form th:action="@{/teacher/grades/{gradeId}/delete(gradeId=${grade.gradeId})}"
-                                  method="post"
-                                  class="grade-delete-form">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                                <input type="hidden" name="studentId" th:value="${selectedStudentId}"/>
-                                <input type="hidden" name="courseId" th:value="${selectedCourseId}"/>
-                                <button type="submit" class="grade-delete-btn">Delete</button>
-                            </form>
+                    <div th:if="${!#lists.isEmpty(studentGrades)}" class="grade-list" id="gradeListContainer">
+                        <div th:each="grade : ${studentGrades}" class="grade-item" th:attr="data-grade-id=${grade.gradeId}">
+                            <div class="grade-delete-form">
+                                <button type="button" 
+                                        class="grade-delete-btn" 
+                                        th:attr="data-grade-id=${grade.gradeId}"
+                                        th:data-student-id="${selectedStudentId}"
+                                        th:data-course-id="${selectedCourseId}">Delete</button>
+                            </div>
 
                             <div class="grade-item-header">
                                 <div>
@@ -655,6 +654,93 @@
                     }
                 });
             });
+
+            // Handle grade deletion
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('grade-delete-btn')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    
+                    const btn = e.target;
+                    const gradeItem = btn.closest('.grade-item');
+                    if (!gradeItem) return false;
+                    
+                    const gradeId = btn.getAttribute('data-grade-id');
+                    const studentId = btn.getAttribute('data-student-id');
+                    const courseId = btn.getAttribute('data-course-id');
+                    
+                    if (!gradeId) return false;
+                    
+                    // Disable button
+                    btn.disabled = true;
+                    btn.textContent = 'Deleting...';
+                    
+                    // Fade out and remove container
+                    gradeItem.style.transition = 'opacity 0.3s ease';
+                    gradeItem.style.opacity = '0';
+                    
+                    // Delete via API first, then remove from UI
+                    fetch(`/api/v1/teacher/grades/${gradeId}`, {
+                        method: 'DELETE',
+                        credentials: 'include',
+                        redirect: 'manual' // Prevent any redirects
+                    }).then(response => {
+                        if (response.ok || response.status === 200) {
+                            // Success - remove element
+                            setTimeout(() => {
+                                gradeItem.remove();
+                                
+                                // Show success message
+                                const alertContainer = document.querySelector('.grade-modal-alert-container');
+                                if (alertContainer) {
+                                    alertContainer.innerHTML = '<div class="grade-modal-alert success">Grade deleted successfully</div>';
+                                    setTimeout(() => {
+                                        const alert = alertContainer.querySelector('.grade-modal-alert');
+                                        if (alert) {
+                                            alert.style.transition = 'opacity 0.3s ease';
+                                            alert.style.opacity = '0';
+                                            setTimeout(() => {
+                                                alertContainer.innerHTML = '';
+                                            }, 300);
+                                        }
+                                    }, 3000);
+                                }
+                                
+                                // Check if empty - but DON'T reload, just show empty state
+                                const gradeListContainer = document.getElementById('gradeListContainer');
+                                if (gradeListContainer) {
+                                    const remaining = gradeListContainer.querySelectorAll('.grade-item');
+                                    if (remaining.length === 0) {
+                                        const emptyState = document.querySelector('.grade-empty-state');
+                                        if (emptyState) {
+                                            emptyState.style.display = 'block';
+                                        }
+                                        if (gradeListContainer) {
+                                            gradeListContainer.style.display = 'none';
+                                        }
+                                    }
+                                }
+                            }, 300);
+                        } else {
+                            // Error - restore element
+                            gradeItem.style.opacity = '1';
+                            btn.disabled = false;
+                            btn.textContent = 'Delete';
+                            alert('Failed to delete grade. Please try again.');
+                        }
+                    }).catch(err => {
+                        console.error('Delete error:', err);
+                        // Restore on error
+                        gradeItem.style.opacity = '1';
+                        btn.disabled = false;
+                        btn.textContent = 'Delete';
+                        alert('Failed to delete grade. Please try again.');
+                    });
+                    
+                    return false;
+                }
+            }, true); // Use capture phase to catch early
         });
     </script>
 </body>
