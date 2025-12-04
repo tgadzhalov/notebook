@@ -187,8 +187,8 @@ class AssignmentSchedulerServiceUTest {
     }
 
     @Test
-    void refreshLeaderboardCache_happyPath() {
+    void refreshStudentHomeCache_happyPath() {
 
-        assertDoesNotThrow(() -> assignmentSchedulerService.refreshLeaderboardCache());
+        assertDoesNotThrow(() -> assignmentSchedulerService.refreshStudentHomeCache());
     }
 }
